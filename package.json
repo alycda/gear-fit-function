@@ -1,6 +1,7 @@
 {
     "scripts": {
-        "preview": "gp preview https://u66tt2qrw9.execute-api.us-east-1.amazonaws.com/dev/"
+        "preview": "gp preview https://fmoi0wwel1.execute-api.us-east-1.amazonaws.com/dev/",
+        "deploy": "sls deploy"
     },
     "devDependencies": {
         "serverless": "^2.16.1"

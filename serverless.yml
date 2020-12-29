@@ -68,6 +68,10 @@ functions:
           path: /
           method: ANY
           cors: true
+      - http: 
+          path: users/create
+          method: GET
+          # cors: true
 
 #      - http:
 #          path: users/create
