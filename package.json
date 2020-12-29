@@ -1,0 +1,8 @@
+{
+    "scripts": {
+        "preview": "gp preview https://u66tt2qrw9.execute-api.us-east-1.amazonaws.com/dev/"
+    },
+    "devDependencies": {
+        "serverless": "^2.16.1"
+    }
+}
