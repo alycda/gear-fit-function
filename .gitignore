@@ -20,3 +20,6 @@ var/
 
 # Serverless directories
 .serverless
+
+# Serverless offline
+*.pyc

@@ -1,4 +1,9 @@
+ports:
+  - port: 3000-3999
+    onOpen: ignore
+
 # List the start up tasks. You can start them in parallel in multiple terminals. See https://www.gitpod.io/docs/config-start-tasks/
 tasks:
-  - init: yarn install # runs during prebuild
-    command: yarn preview
+  - before: yarn install
+    init: yarn start # runs during prebuild
+    command: gp preview $(gp url 3000)/dev

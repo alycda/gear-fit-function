@@ -2,17 +2,18 @@ import json
 
 
 def hello(event, context):
-    if event.resource == "/":
-        body = {
-            "message": "Go Serverless v1.0! Your function executed successfully!",
-            # "input": event.queryStringParameters,
-            "event": event,
-            # "context": context
-        }
+    # if event.get("resource") == "/":
+    body = {
+        "message": "Go Serverless v1.0! Your function executed successfully!",
+        # "input": event.queryStringParameters,
+        "event": event
+        # "context": context
+    }
 
-    elif event.resource == "/users/create":
-        body = "Hello World"
-
+    # elif event.get("resource") == "/users/create":
+    #     body = {
+    #         "message": "Hello World"
+    #     }
 
     response = {
         "statusCode": 200,
@@ -20,12 +21,3 @@ def hello(event, context):
     }
 
     return response
-
-    # Use this code if you don't use the http event with the LAMBDA-PROXY
-    # integration
-    """
-    return {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
-        "event": event
-    }
-    """
