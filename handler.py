@@ -4,34 +4,26 @@ import os
 # if we're working locally, prepend /dev/ to the URL
 root = "/dev/" if os.environ['IS_OFFLINE'] else "/"
 
-def the_govnuh(msg = "desfult message"):         #function to build the body object (it's a body builder, like Schwarzenegger!)
+#function to build the body object (it's a body builder, like Schwarzenegger!)
+def the_govnuh(msg = "default message",dict = {}):      
     return {
-        "message": msg
+        "message": msg,
+        **dict,
     }
 
 def hello(event, context):
     global root
 
-    body = the_govnuh("Go Serverless v1.0! Your function executed successfully!")
+    #default response when no other routes are matched
+    body = the_govnuh("Go Serverless v1.0! Your function executed successfully!",{"event":event})
 
-    # body = {          #default response when no other routes are matched
-    #     "message": "Go Serverless v1.0! Your function executed successfully!",
-    #     # "input": event['queryStringParameters'],
-    #     "event": event
-    #     # "context": context
-    # }
+    qSP = event['queryStringParameters']
 
     if event['resource'] == root + "users/create":
-        if event['queryStringParameters']:
-            body = {
-                "message": "Hello World",
-                "input": event['queryStringParameters'],
-                "bob": "My bust size is " + event['queryStringParameters']["bust"],
-            }
+        if qSP:
+            body = the_govnuh("My bust size is " + qSP["bust"],{"input": qSP})
         else: 
-            body = {
-                "message": "Missing qSP",
-            }
+            body = the_govnuh("Missing qSP")
 
     response = {
         "statusCode": 200,
