@@ -1,6 +1,8 @@
 {
     "scripts": {
         "start": "sls offline start",
+        "get-url": "sls info --verbose | sed -ne 's/^ServiceEndpoint: //p'",
+        "preview": "gp preview $(yarn sls info --verbose | sed -ne 's/^ServiceEndpoint: //p')",
         "deploy": "sls deploy"
     },
     "devDependencies": {
