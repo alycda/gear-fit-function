@@ -1,0 +1,19 @@
+{
+    "rest-client.previewOption": "exchange",
+    "rest-client.environmentVariables": {
+        "$shared": {
+            "root": "/dev"
+        },
+        "local": {
+            // gp url 3000
+            "host": "https://3000-b7a53022-668f-453f-8540-3ebfe23a167d.ws-us03.gitpod.io"
+            // "host": "{{$shared GITPOD_WORKSPACE_URL}}",
+            // "host": "GITPOD_WORKSPACE_URL",
+            // "host": "3000-{{$processEnv GITPOD_WORKSPACE_ID}}.ws-us03.gitpod.io"
+        },
+        "production": {
+            "host": "https://fmoi0wwel1.execute-api.us-east-1.amazonaws.com",
+            // "host": "SLS_URL" // run `yarn get-url`
+        }
+    }
+}

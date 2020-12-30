@@ -1,0 +1,19 @@
+# @url = {{$processEnv %host}}{{root}}
+@url = {{host}}{{root}}
+
+# @name home
+{{url}}
+
+###
+
+# @name create_user_error
+{{url}}/users/create
+###
+
+# @name create_user
+{{url}}/users/create
+    ?bust=33
+    &waist=35
+
+
+@user = {{create_user.response.body.user_id}}
