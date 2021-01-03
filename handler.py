@@ -24,10 +24,10 @@ def hello(event, context):
     try: 
         mydb = mysql.connector.connect(
         host = '192.185.50.220',
-        #port = 2083, #not sure I need port here, take it out and see what happens
+        #port = 2083, #not sure I need port here, take it out and see what happens #it works! I don't need port apparently
         user = 'carolann_dbtest',
         password = '123456',
-        auth_plugin = 'mysql_native_password',
+        auth_plugin = 'mysql_native_password', #when testing in vscode, the mysql extension only supported this older authentication scheme. Might be able to upgrade now
         database = "carolann_moto_gear_fit_calculator",
         )
         print("MySQL connection open")
@@ -40,10 +40,11 @@ def hello(event, context):
             if qSP:
                 #body = the_govnuh("My bust size is " + qSP["bust"],{"input": qSP}) #original test message, replaced with db message below
                 user_bust = qSP["bust"]
-                sql = "INSERT INTO fc_users(user_bust) values(%s);"%(user_bust)
+                user_waist = qSP["waist"]
+                sql = "INSERT INTO fc_users(user_bust,user_waist) values(%s,%s);"%(user_bust,user_waist)
                 cursor.execute(sql)
                 mydb.commit()
-                body = the_govnuh("My bust size is " + user_bust + ", writing to users.")
+                body = the_govnuh("My bust is " + user_bust + " inches, and my waist " + user_waist + " inches. Writing to users.")
 
             else: 
                 body = the_govnuh("Missing qSP")
