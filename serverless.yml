@@ -88,46 +88,47 @@ functions:
           path: users/delete
           method: GET
           # cors: true
-      - http: 
-          path: gear/create
-          method: GET
-          # cors: true
-      - http: 
-          path: gear/get-many
-          method: GET
-          # cors: true
-      - http: 
-          path: gear/get-one
-          method: GET
-          # cors: true
-      - http: 
-          path: gear/update
-          method: GET
-          # cors: true
-      - http: 
-          path: gear/delete
-          method: GET
-          # cors: true
-      - http: 
-          path: fr/create
-          method: GET
-          # cors: true
-      - http: 
-          path: fr/get-many
-          method: GET
-          # cors: true
-      - http: 
-          path: fr/get-one
-          method: GET
-          # cors: true
-      - http: 
-          path: fr/update
-          method: GET
-          # cors: true
-      - http: 
-          path: fr/delete
-          method: GET
-          # cors: true
+      #need to make sure user endpoints work before I write gear and fit reports
+      # - http: 
+      #     path: gear/create
+      #     method: GET
+      #     # cors: true
+      # - http: 
+      #     path: gear/get-many
+      #     method: GET
+      #     # cors: true
+      # - http: 
+      #     path: gear/get-one
+      #     method: GET
+      #     # cors: true
+      # - http: 
+      #     path: gear/update
+      #     method: GET
+      #     # cors: true
+      # - http: 
+      #     path: gear/delete
+      #     method: GET
+      #     # cors: true
+      # - http: 
+      #     path: fr/create
+      #     method: GET
+      #     # cors: true
+      # - http: 
+      #     path: fr/get-many
+      #     method: GET
+      #     # cors: true
+      # - http: 
+      #     path: fr/get-one
+      #     method: GET
+      #     # cors: true
+      # - http: 
+      #     path: fr/update
+      #     method: GET
+      #     # cors: true
+      # - http: 
+      #     path: fr/delete
+      #     method: GET
+      #     # cors: true
 
 #      - http:
 #          path: users/create
