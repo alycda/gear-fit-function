@@ -15,6 +15,7 @@ def connector():
         database = os.environ.get('GEAR_CALC_DATABASE'),
         )
         cursor = conn.cursor() 
+        nt_cursor = conn.cursor(named_tuple=True)
     return cursor
     #pass
 

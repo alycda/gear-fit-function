@@ -79,30 +79,37 @@ def hello(event, context):
 
         if event['resource'] == root + "users/update": #updates any given values for a (mandatory) given user id
             if qSP:
+                ### if the below doesn't work, try this instead
+                # user_id = qSP["id"]
+                # if qSP["bust"] and qSP["waist"]:
+                #     user_bust = qSP["bust"]
+                #     user_waist = qSP["waist"]
+                #     sql = "UPDATE fc_users SET user_bust = %s AND user_waist = %s WHERE user_id = %s;"%(user_bust,user_waist,user_id) 
+                # elif qSP["bust"]:
+                #     user_bust = qSP["bust"]
+                #     sql = "UPDATE fc_users SET user_bust = %s WHERE user_id = %s;"%(user_bust,user_id) 
+                # elif qSP["waist"]:
+                #     user_waist = qSP["waist"]
+                #     sql = "UPDATE fc_users SET user_waist = %s WHERE user_id = %s;"%(user_waist,user_id) 
+                # cursor.execute(sql)
+                # conn.commit()
+                # body = the_govnuh("The user id is " + user_id + ", the new user bust is " + user_bust + ", and the new user waist is " + user_waist + "./n")
+
                 user_id = qSP["id"]
-                if qSP["bust"] and qSP["waist"]:
-                    user_bust = qSP["bust"]
-                    user_waist = qSP["waist"]
-                    sql = "UPDATE fc_users SET user_bust = %s AND user_waist = %s WHERE user_id = %s;"%(user_bust,user_waist,user_id) 
-                elif qSP["bust"]:
-                    user_bust = qSP["bust"]
-                    sql = "UPDATE fc_users SET user_bust = %s WHERE user_id = %s;"%(user_bust,user_id) 
-                elif qSP["waist"]:
-                    user_waist = qSP["waist"]
-                    sql = "UPDATE fc_users SET user_waist = %s WHERE user_id = %s;"%(user_waist,user_id) 
+                def user_updater(user_id, **update):
+                    #normal sql update: "UPDATE table SET col1 = val 1, col2 = val2... WHERE col9 = val9;"
+                    query = "UPDATE fc_users SET "
+                    for kw, arg in update.items():
+                        if arg != 0 and arg is not None:
+                            query += " %s = %s,"%(kw,arg)
+                    query -= "," #strip last comma from query
+                    query += " WHERE user_id = %s;"%(user_id)        
+                    return query
+                updates = {"user_bust":qSP["bust"],"user_waist":qSP["waist"],"user_derived_bust":qSP["der-bust"],"user_derived_waist":qSP["der-waist"]}
+                sql = user_updater(user_id, updates)
                 cursor.execute(sql)
                 conn.commit()
-                body = the_govnuh("The user id is " + user_id + ", the new user bust is " + user_bust + ", and the new user waist is " + user_waist + "./n")
-
-                #would be fun to set up with **kwargs, but the AND in sql queries gets messier than just handling 3 if statements
-                # kwargs = {"user_bust":qSP["bust"],"user_waist":qSP["waist"]}
-                # def user_updater(user_id, **kwargs):
-                #     sql = "UPDATE users SET "
-                #     for kw, arg in kwargs:
-                #         sql += ("%s = %s "%(kw,arg))
-                #     sql.append( "WHERE user_id = %s"%user_id)
-                #     return sql
-                # query_builder(user_id, kwargs)
+                body = the_govnuh("The following values were updated for User %s: %s"%(user_id,updates))
             else:
                 body = the_govnuh("Missing qSP")
 
