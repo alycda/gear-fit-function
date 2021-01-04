@@ -44,11 +44,39 @@ def hello(event, context):
                 cursor.execute(sql)
                 conn.commit()
                 body = the_govnuh("My bust is " + user_bust + " inches, and my waist is " + user_waist + " inches. Writing to users.")
-                #Call fr/create here if qSP has fr_info                
             else: 
                 body = the_govnuh("Missing qSP")
 
-        if event['resource'] == root + "users/get-many": #returns all data for user id's in a given range
+        if event['resource'] == root + "gear/create": 
+            if qSP:
+                gear_type = qSP["type"]
+                gear_brand = qSP["brand"]
+                gear_name = qSP["name"]
+                gear_size = qSP["size"]
+                gear_bust = qSP["bust"]
+                gear_waist = qSP["waist"]
+                sql = "INSERT INTO fc_gear(gear_type,gear_brand,gear_name,gear_size,gear_derived_bust,gear_derived_waist) values(%s,%s,%s,%s,%s,%s);"%(gear_type,gear_brand,gear_name,gear_size,gear_bust,gear_waist)
+                cursor.execute(sql)
+                conn.commit()
+                body = the_govnuh("New gear created! Gear type is %s, brand is %s, name is %s, size is %s, bust is %s, and waist is %s"%(gear_type,gear_brand,gear_name,gear_size,gear_bust,gear_waist))
+            else: 
+                body = the_govnuh("Missing qSP")
+        
+        if event['resource'] == root + "fr/create": 
+            if qSP:
+                fr_gear_id = qSP["gear"]
+                fr_user_id = qSP["user"]
+                fr_backpro = qSP["backpro"]
+                fr_bust_adjust = qSP["bust"]
+                fr_waist_adjust = qSP["waist"]
+                sql = "INSERT INTO fc_fit_reports(fr_gear_id,fr_user_id,fr_backpro,fr_bust_adjust,fr_waist_adjust) values(%s,%s,%s,%s,%s);"%(fr_gear_id,fr_user_id,fr_backpro,fr_bust_adjust,fr_waist_adjust)
+                cursor.execute(sql)
+                conn.commit()
+                body = the_govnuh("New fit report created! Gear ID is %s, user ID is %s, bust adjust is %s, and waist adjust is %s;"%(fr_gear_id,fr_user_id,fr_bust_adjust,fr_waist_adjust))
+            else: 
+                body = the_govnuh("Missing qSP")
+
+        if event['resource'] == root + "users/get-many": #returns all data for all user id's in a given range
             if qSP:
                 id_min = qSP["min"]
                 id_max = qSP["max"]
@@ -60,7 +88,90 @@ def hello(event, context):
                         user_id = row.user_id
                         user_bust = row.user_bust
                         user_waist = row.user_waist
-                        body[user_id] = the_govnuh("The user id is " + str(user_id) + ", the user bust is " + str(user_bust) + ", and the user waist is " + str(user_waist) + ". ")
+                        if row.user_derived_bust:
+                            user_derived_bust = row.user_derived_bust
+                        if row.user_derived_waist:
+                            user_derived_waist = row.user_derived_waist
+                        # body[user_id] = the_govnuh("The user id is " + str(user_id) + ", the user bust is " + str(user_bust) + ", and the user waist is " + str(user_waist) + ". ")
+                        body[user_id] = the_govnuh("For user id %s, the bust is %s, the waist is %s, the derived bust is %s, and the derived waist is %s"%(user_id,user_bust,user_waist,user_derived_bust,user_derived_waist))
+            else:
+                body = the_govnuh("Missing qSP")
+
+        if event['resource'] == root + "gear/get-many": #returns all data for all gear with a single given parameter (eg brand or name) #later can add size ranges
+            if qSP:
+                if qSP.get("gear") is not None:
+                    gear_id = qSP["gear"]
+                    sql = "SELECT * FROM fc_gear WHERE gear_id = %s;"%(gear_id) #this should only return 1 record
+                if qSP.get("type") is not None:
+                    gear_type = qSP["type"]
+                    sql = "SELECT * FROM fc_gear WHERE gear_type = %s LIMIT 100;"%(gear_type)
+                elif qSP.get("brand") is not None:
+                    gear_brand = qSP["brand"]
+                    sql = "SELECT * FROM fc_gear WHERE gear_brand = %s LIMIT 100;"%(gear_brand)
+                elif qSP.get("name") is not None:
+                    gear_name = qSP["name"]
+                    sql = "SELECT * FROM fc_gear WHERE gear_name = %s LIMIT 100;"%(gear_name)                
+                nt_cursor.execute(sql)
+                res = nt_cursor.fetchall() #res should be a list of named tuples, with each column name as the index
+                for row in res:
+                    if row.gear_id: #checks if gear id exists, to protect against id's being out of range
+                        gear_id = row.gear_id
+                        gear_type = row.gear_type
+                        gear_brand = row.gear_brand
+                        gear_name = row.gear_name
+                        gear_size = row.gear_size
+                        gear_bust = row.gear_bust
+                        gear_waist = row.gear_waist                        
+                        body[user_id] = the_govnuh("For gear id %s, the gear type is %s, brand is %s, name is %s, size is %s, derived bust is %s, and derived waist is %s."%(gear_id,gear_type,gear_brand,gear_name,gear_size,gear_bust,gear_waist))
+            else:
+                body = the_govnuh("Missing qSP")
+
+        if event['resource'] == root + "fr/get-many": #returns all fit reports for a given user id OR a given gear id
+            if qSP:
+                if qSP.get("gear") is not None:
+                    fr_gear_id = qSP["gear"]
+                    sql = "SELECT * FROM fc_fit_reports WHERE fr_gear_id = %s;"%(fr_gear_id)
+                    nt_cursor.execute(sql)
+                    res = nt_cursor.fetchall() #res should be a list of named tuples, with each column name as the index
+                    for row in res:
+                        if row.fr_id: #checks if record exists, to protect against id's being out of range
+                            fr_id = row.fr_id
+                            fr_user_id = row.fr_user_id
+                            fr_backpro = row.fr_backpro
+                            fr_bust_adjust = row.fr_bust_adjust
+                            fr_waist_adjust = row.fr_waist_adjust
+                            if row.gear_bust_est:
+                                gear_bust_est = row.gear_bust_est
+                            if row.gear_waist_est: 
+                                gear_waist_est = row.gear_waist_est
+                            if row.user_bust_est:
+                                user_bust_est = row.user_bust_est
+                            if row.user_waist_est:
+                                user_waist_est = row.user_waist_est
+                            body[fr_id] = the_govnuh("For fit report %s, the user is %s, back protector is %s, bust adjust is %s, and waist adjust is %s. The estimated bust of the item is %s, and the estimated waist of the item is %s. The estimated bust of the user is %s, and the estimated waist of the user is %s"%(fr_id,fr_user_id,fr_backpro,fr_bust_adjust,fr_waist_adjust,gear_bust_est,gear_waist_est,user_bust_est,user_waist_est))
+                elif qSP.get("user") is not None:
+                    fr_user_id = qSP["user"]
+                    sql = "SELECT * FROM fc_fit_reports WHERE fr_user_id = %s;"%(fr_user_id)
+                    nt_cursor.execute(sql)
+                    res = nt_cursor.fetchall() #res should be a list of named tuples, with each column name as the index
+                    for row in res:
+                        if row.fr_id: #checks if record exists, to protect against id's being out of range
+                            fr_id = row.fr_id
+                            fr_gear_id = row.fr_gear_id
+                            fr_backpro = row.fr_backpro
+                            fr_bust_adjust = row.fr_bust_adjust
+                            fr_waist_adjust = row.fr_waist_adjust
+                            if row.gear_bust_est:
+                                gear_bust_est = row.gear_bust_est
+                            if row.gear_waist_est: 
+                                gear_waist_est = row.gear_waist_est
+                            if row.user_bust_est:
+                                user_bust_est = row.user_bust_est
+                            if row.user_waist_est:
+                                user_waist_est = row.user_waist_est
+                            body[fr_id] = the_govnuh("For fit report %s, the gear id is %s, back protector is %s, bust adjust is %s, and waist adjust is %s. The estimated bust of the item is %s, and the estimated waist of the item is %s. The estimated bust of the user is %s, and the estimated waist of the user is %s"%(fr_id,fr_gear_id,fr_backpro,fr_bust_adjust,fr_waist_adjust,gear_bust_est,gear_waist_est,user_bust_est,user_waist_est))
+                else:
+                    body = the_govnuh("Please specify whether you're looking by user or gear id. ")
             else:
                 body = the_govnuh("Missing qSP")
 
@@ -74,6 +185,48 @@ def hello(event, context):
                 user_bust = res.user_bust
                 user_waist = res.user_waist
                 body = the_govnuh("The user id is " + str(user_id) + ", the user bust is " + str(user_bust) + ", and the user waist is " + str(user_waist) + "./n")
+            else:
+                body = the_govnuh("Missing qSP")
+
+        if event['resource'] == root + "gear/get-one": #returns all data for a given gear id
+            if qSP:
+                gear_id = qSP["id"]
+                sql = "SELECT * FROM fc_gear WHERE gear_id = %s;"%(gear_id)
+                nt_cursor.execute(sql)
+                res = nt_cursor.fetchone() #res is a list of named tuples, with each column name as the index
+                gear_type = res.gear_type
+                gear_brand = res.gear_brand
+                gear_name = res.gear_name
+                gear_size = res.gear_size
+                gear_derived_bust = res.gear_derived_bust
+                gear_derived_waist = res.gear_derived_waist
+                body = the_govnuh("For gear id %s, the type is %s, the brand is %s, the name is %s, the size is %s, the derived bust is %s, and the derived waist is %s"%(gear_id,gear_type,gear_brand,gear_name,gear_size,gear_derived_bust,gear_derived_waist))
+            else:
+                body = the_govnuh("Missing qSP")
+
+        if event['resource'] == root + "fr/get-one": #returns all data for a given fit report id
+            if qSP:
+                fr_id = qSP["id"]
+                sql = "SELECT * FROM fc_fit_reports WHERE fr_id = %s;"%(fr_id)
+                nt_cursor.execute(sql)
+                res = nt_cursor.fetchone() #res is a list of named tuples, with each column name as the index
+                if res.fr_id:
+                    fr_gear_id = res.fr_gear_id
+                    fr_user_id = res.fr_user_id
+                    fr_backpro = res.fr_backpro
+                    fr_bust_adjust = res.fr_bust_adjust
+                    fr_waist_adjust = res.fr_waist_adjust
+                    if row.gear_bust_est:
+                        gear_bust_est = row.gear_bust_est
+                    if row.gear_waist_est: 
+                        gear_waist_est = row.gear_waist_est
+                    if row.user_bust_est:
+                        user_bust_est = row.user_bust_est
+                    if row.user_waist_est:
+                        user_waist_est = row.user_waist_est
+                    body = the_govnuh("For fit report %s, the gear id is %s, back protector is %s, bust adjust is %s, and waist adjust is %s. The estimated bust of the item is %s, and the estimated waist of the item is %s. The estimated bust of the user is %s, and the estimated waist of the user is %s"%(fr_id,fr_gear_id,fr_backpro,fr_bust_adjust,fr_waist_adjust,gear_bust_est,gear_waist_est,user_bust_est,user_waist_est))
+                else:
+                    body = the_govnuh("Fit report ID %s does not exist. "%(fr_id))
             else:
                 body = the_govnuh("Missing qSP")
 
