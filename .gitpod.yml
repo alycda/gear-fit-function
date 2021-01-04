@@ -5,9 +5,9 @@ ports:
 # List the start up tasks. You can start them in parallel in multiple terminals. See https://www.gitpod.io/docs/config-start-tasks/
 tasks:
   - before: yarn install
-    # init: yarn start # runs during prebuild
-    init: pip install mysql-connector && yarn start
+    init: yarn start # runs during prebuild
     command: gp preview $(gp url 3000)/dev
+  - init: pip install mysql-connector
 
 #import mySQL image
 image: gitpod/workspace-mysql
