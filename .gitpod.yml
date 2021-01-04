@@ -7,7 +7,7 @@ tasks:
   - before: yarn install
     init: yarn start # runs during prebuild
     command: gp preview $(gp url 3000)/dev
-  - init: pip install mysql-connector
+  # - init: pip install mysql-connector
 
 #import mySQL image
 image: gitpod/workspace-mysql
